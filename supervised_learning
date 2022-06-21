@@ -1,0 +1,111 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+from scipy.stats.stats import pearsonr
+from scipy.stats import entropy 
+
+df=pd.read_csv('/content/gdrive/MyDrive/hcvdat0.csv')
+df2=df.dropna()
+df2.loc[df2.Category == '0=Blood Donor', 'label'] = 0
+df2.loc[df2.Category == '0s=suspect Blood Donor', 'label'] = 0
+df2.loc[df2.Category == '1=Hepatitis', 'label'] = 1
+df2.loc[df2.Category == '2=Fibrosis', 'label'] = 2
+df2.loc[df2.Category == '3=Cirrhosis', 'label'] = 2
+
+## Naive Bayes
+
+from sklearn.naive_bayes import GaussianNB
+from sklearn.model_selection import train_test_split
+
+nb=GaussianNB()
+y_nb=np.zeros(10)
+for j in combinations: 
+  for i in range(10):
+
+    x = df2[j]
+    y = df2['label']
+    x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.25)  
+
+    output_nb=nb.fit(x_train,y_train).predict(x_test)
+    print('# mislabled from total %d data: %d' % (x_test.shape[0], (y_test != output_nb).sum()))
+    y_nb[i]=((y_test != output_nb).sum())
+
+  print(y_nb)
+  print('average mislabled data is %d' % np.average(y_nb))
+  print('average percent error is %g percent' % ((np.average(y_nb)/x_test.shape[0])*100))
+
+  results_nb[str(j)]=np.average(y_nb)
+  
+ ## Support Vector Machine
+
+from sklearn.model_selection import train_test_split
+from sklearn.svm import SVC
+
+svm=SVC()
+y_svm=np.zeros(10)
+
+for j in combinations:
+  for i in range(10):
+
+    x = df2[j]
+    y = df2['label']
+    x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.25)
+
+    output_svm=svm.fit(x_train,y_train).predict(x_test)
+    print('# mislabled from total %d data: %d' % (x_test.shape[0], (y_test != output_svm).sum()))
+    y_svm[i]=((y_test != output_svm).sum())
+
+    print(y_svm)
+    print('average mislabled data is %d' % np.average(y_svm))
+    print('average percent error is %g percent' % ((np.average(y_svm)/x_test.shape[0])*100))
+
+    results_svm[str(j)]=np.average(y_svm)
+  
+ ## Random Forests
+ 
+ from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+
+rfc=RandomForestClassifier()
+y_rfc=np.zeros(10)
+
+for j in combinations:
+  for i in range(10):
+
+    x = df2[j]
+    y = df2['label']
+    x_train, x_test, y_train, y_test = train_test_split(x,y,test_size=0.25)
+
+    output_rfc=rfc.fit(x_train,y_train).predict(x_test)
+    print('# mislabled from total %d data: %d' % (x_test.shape[0], (y_test != output_rfc).sum()))
+    y_rfc[i]=((y_test != output_rfc).sum())
+
+    print(y_rfc)
+    print('average mislabled data is %d' % np.average(y_rfc))
+    print('average percent error is %g percent' % ((np.average(y_rfc)/x_test.shape[0])*100))
+
+results_rfc[str(j)]=np.average(y_rfc)
+
+## performance metrics
+
+from sklearn.metrics import confusion_matrix
+from sklearn.metrics import accuracy_score
+from sklearn.metrics import classification_report
+
+y_true = y_test
+y_pred_nb = output_nb
+y_pred_svm = output_svm
+y_pred_rfc = output_rfc
+
+
+CM_nb = confusion_matrix(y_true,y_pred_nb)
+CM_svm = confusion_matrix(y_true,y_pred_svm)
+CM_rfc = confusion_matrix(y_true,y_pred_rfc)
+
+spec_nb = classification_report(y_true, y_pred_nb)
+spec_svm = classification_report(y_true, y_pred_svm)
+spec_rfc = classification_report(y_true, y_pred_rfc)
+
+print(spec_nb)
+print(spec_svm)
+print(spec_rfc)
