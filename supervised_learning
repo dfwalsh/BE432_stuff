@@ -12,6 +12,42 @@ df2.loc[df2.Category == '1=Hepatitis', 'label'] = 1
 df2.loc[df2.Category == '2=Fibrosis', 'label'] = 2
 df2.loc[df2.Category == '3=Cirrhosis', 'label'] = 2
 
+results={}
+results_nb={}
+results_svm={}
+results_rfc={}
+combinations=[]
+labels=['ALB','ALP', 'ALT',	'AST',	'BIL',	'CHE',	'CHOL',	'CREA', 'GGT', 'PROT']
+for i in range(len(labels)): 
+  combinations.append([labels[i]])
+  i+=1
+
+for i in range(len(labels)):
+  for j in range(i+1,len(labels)):
+    combinations.append([labels[i],labels[j]])
+    j+=1
+  i+=1
+
+for i in range(len(labels)):
+  for j in range(i+1,len(labels)):
+      for k in range (j+1,len(labels)):
+        combinations.append([labels[i],labels[j],labels[k]])
+        k+=1
+      j+=1
+ i+=1
+#for i in range(len(labels)):
+ # for j in range(i+1,len(labels)):
+      #for k in range (j+1,len(labels)):
+      #  for l in range(k+1,len(labels)):
+     #     combinations.append([labels[i],labels[j],labels[k],labels[l]])
+    #      l+=1
+   #     k+=1
+  #    j+=1
+ # i+=1
+
+pprint(combinations)
+    
+
 ## Naive Bayes
 
 from sklearn.naive_bayes import GaussianNB
